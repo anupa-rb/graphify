@@ -2,13 +2,13 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import "../styles.css";
+import "../styles/styles.css";
 
 function NavBar() {
   return (
-    <Navbar expand="lg" style={{ backgroundColor: "#1d5c94" }}>
+    <Navbar expand="lg" style={{ backgroundColor: "#1E293B" }}>
       <Container>
-        <Navbar.Brand style={{ color: "white" }} href="#home">
+        <Navbar.Brand style={{ color: "white" }} href="/">
           Graphify
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />

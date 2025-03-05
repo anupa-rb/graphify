@@ -3,17 +3,20 @@ import Home from "../Pages/Home";
 import Prim from "../Pages/Prims";
 import Kruskal from "../Pages/Kruskals";
 import Dijktra from "../Pages/Dijktras";
+import LandingPage from "../Pages/LandingPage";
+import LearnMore from "../Pages/LearnMore";
 
 
 const Router = () => {
   return (
     <BrowserRouter>
       <Switch></Switch>
-
-      <Route path="/" component={Home} exact />
+      <Route path="/" component={LandingPage} exact/>
+      <Route path="/home" component={Home}/>
       <Route path="/prims" component={Prim} />
       <Route path="/kruskals" component={Kruskal} />
       <Route path="/dijkstras" component={Dijktra} />
+      <Route path="/learnMore" component={LearnMore} />
 
     </BrowserRouter>
   );

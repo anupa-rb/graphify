@@ -1,0 +1,39 @@
+.pageStyle {
+  background-color: #1e293b;
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.containerStyle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: aliceblue;
+  margin-top: -10%;
+  font-family: "Montserrat", serif;
+  font-weight: 1000;
+}
+.btn {
+  margin: 10px;
+}
+.cardStyle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+.card {
+  align-items: "center";
+  margin: 10px;
+}
+.card-link {
+  text-decoration: none; /* Remove underline */
+  color: inherit; /* Inherit color from parent */
+}
