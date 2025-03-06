@@ -8,14 +8,15 @@ const LandingPage = () => {
       <div className="containerStyle">
         <h1>GRAPHIFY</h1>
       </div>
-      <Button variant="outline-light" size="lg" href="/home" className="btn">
+      <div style={{color:"GrayText"}}>A graph visualiser web with gaming features to make the learning platform more engaging</div>
+      {/* <Button variant="outline-light" size="lg" href="/home" className="btn">
         Start Learning
-      </Button>
+      </Button> */}
       <div className="cardStyle">
         <Card.Link href="/prims">
           <Card className="card">
             <Card.Body>
-              <Card.Title>
+              <Card.Title style={{ color: "#FACC15" }}>
                 Prim's
                 <br />
                 Algorithm
@@ -26,7 +27,7 @@ const LandingPage = () => {
         <Card.Link href="/kruskals">
           <Card className="card">
             <Card.Body>
-              <Card.Title>
+              <Card.Title style={{ color: "yellowgreen" }}>
                 Kruskal's
                 <br />
                 Algorithm
@@ -37,7 +38,7 @@ const LandingPage = () => {
         <Card.Link href="/dijkstras">
           <Card className="card">
             <Card.Body>
-              <Card.Title>
+              <Card.Title style={{ color: " #C084FC" }}>
                 Dijkstra's
                 <br />
                 Algorithm

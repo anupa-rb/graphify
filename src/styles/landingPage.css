@@ -38,13 +38,28 @@
   border-radius: 20px;
   max-width: 90%;
   max-height: 90%;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.404), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: rgba(30, 41, 59);
+  color: aliceblue;
+  border: 0.5px solid rgba(240, 248, 255, 0.377);
+  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.404), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
   background-size: cover !important;
 }
 .card:hover {
   box-shadow: 0 4px 20px #40526e; /* Glow effect */
+  transform: translateY(-10px);
 }
 .card-link {
   text-decoration: none; /* Remove underline */
   color: inherit; /* Inherit color from parent */
+}
+.card-title {
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  color: yellowgreen;
+  font-weight: 500;
+  font-size: 150%;
+  align-self: center;
+  margin-top: 45px;
 }

@@ -8,8 +8,8 @@ function NavBar() {
   return (
     <Navbar expand="lg" style={{ backgroundColor: "#1E293B" }}>
       <Container>
-        <Navbar.Brand style={{ color: "white" }} href="/">
-          Graphify
+        <Navbar.Brand style={{ color: "white",  fontFamily: "Montserrat" }} href="/">
+          GRAPHIFY
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="navbar-custom">

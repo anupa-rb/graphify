@@ -3,13 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "algorithm-visualizer": "^2.3.9",
     "bootstrap": "^5.3.3",
     "cra-template": "1.2.0",
     "react": "^19.0.0",
+    "react-app-rewired": "^2.2.1",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",
     "react-router-dom": "^5.3.4",
     "react-scripts": "5.0.1",
+    "vis-network": "^9.1.9",
     "web-vitals": "^4.2.4"
   },
   "scripts": {
