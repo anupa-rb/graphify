@@ -11,33 +11,30 @@ const Prim = () => {
   const [feedback, setFeedback] = useState("");
   const [originalEdgeColors, setOriginalEdgeColors] = useState(new Map());
 
-  // Preserve nodes and edges across re-renders using useState
-  const [nodes] = useState(
-    () =>
-      new DataSet([
-        { id: 1, label: "Node 1" },
-        { id: 2, label: "Node 2" },
-        { id: 3, label: "Node 3" },
-        { id: 4, label: "Node 4" },
-        { id: 5, label: "Node 5" },
-      ])
+  const nodes = useRef(
+    new DataSet([
+      { id: 1, label: "Node 1" },
+      { id: 2, label: "Node 2" },
+      { id: 3, label: "Node 3" },
+      { id: 4, label: "Node 4" },
+      { id: 5, label: "Node 5" },
+    ])
   );
 
-  const [edges] = useState(
-    () =>
-      new DataSet([
-        { id: "1-2", from: 1, to: 2, label: "3", weight: 3 },
-        { id: "1-3", from: 1, to: 3, label: "1", weight: 1 },
-        { id: "2-3", from: 2, to: 3, label: "2", weight: 2 },
-        { id: "2-4", from: 2, to: 4, label: "4", weight: 4 },
-        { id: "3-4", from: 3, to: 4, label: "5", weight: 5 },
-        { id: "4-5", from: 4, to: 5, label: "7", weight: 7 },
-        { id: "3-5", from: 3, to: 5, label: "6", weight: 6 },
-      ])
+  const edges = useRef(
+    new DataSet([
+      { id: "1-2", from: 1, to: 2, label: "3", weight: 3 },
+      { id: "1-3", from: 1, to: 3, label: "1", weight: 1 },
+      { id: "2-3", from: 2, to: 3, label: "2", weight: 2 },
+      { id: "2-4", from: 2, to: 4, label: "4", weight: 4 },
+      { id: "3-4", from: 3, to: 4, label: "5", weight: 5 },
+      { id: "4-5", from: 4, to: 5, label: "7", weight: 7 },
+      { id: "3-5", from: 3, to: 5, label: "6", weight: 6 },
+    ])
   );
 
   useEffect(() => {
-    const data = { nodes, edges };
+    const data = { nodes: nodes.current, edges: edges.current };
     const options = {
       edges: { font: { align: "top" }, color: { color: "#aaa" } },
       physics: false,
@@ -46,18 +43,21 @@ const Prim = () => {
     const network = new Network(containerRef.current, data, options);
     networkRef.current = network;
 
-    setMstEdges(computeMST());
+    setMstEdges(computeMST(edges.current));
 
-    network.on("selectEdge", (params) => {
+    const handleSelectEdge = (params) => {
       const edgeId = params.edges[0];
       toggleEdgeSelection(edgeId);
-    });
+    };
 
-    return () => network.destroy();
+    network.on("selectEdge", handleSelectEdge);
+
+    return () => {
+      network.off("selectEdge", handleSelectEdge);
+      network.destroy();
+    };
   }, []);
 
-  // Rest of the code remains the same...
-  // [Ensure all other functions (toggleEdgeSelection, updateEdgeColor, etc.) remain unchanged]
   const toggleEdgeSelection = (edgeId) => {
     setSelectedEdges((prev) => {
       const updated = new Set(prev);
@@ -66,7 +66,7 @@ const Prim = () => {
         updateEdgeColor(edgeId, originalEdgeColors.get(edgeId) || "#aaa"); // reset edge color
       } else {
         if (!originalEdgeColors.has(edgeId)) {
-          const edge = edges.get(edgeId);
+          const edge = edges.current.get(edgeId);
           if (edge) {
             const edgeColor = edge.color?.color || "#aaa"; // Default to the normal gray if undefined
             setOriginalEdgeColors((prevColors) =>
@@ -77,26 +77,24 @@ const Prim = () => {
         updated.add(edgeId);
         updateEdgeColor(edgeId, "#00f"); // blue - selected edge
       }
-      console.log("here");
-      console.log(updated);
       return updated;
     });
   };
 
   const updateEdgeColor = (edgeId, color) => {
-    const edge = edges.get(edgeId);
+    const edge = edges.current.get(edgeId);
     if (edge) {
-      edges.update({ id: edgeId, color: { color } });
+      edges.current.update({ id: edgeId, color: { color } });
       networkRef.current.redraw();
     }
   };
 
   const updateNodeColor = (nodeId, color) => {
-    nodes.update({ id: nodeId, color: { background: color } });
+    nodes.current.update({ id: nodeId, color: { background: color } });
     networkRef.current.redraw();
   };
 
-  const computeMST = () => {
+  const computeMST = (edges) => {
     const mst = [];
     const mstNodes = new Set();
     const edgeQueue = [];
@@ -115,7 +113,7 @@ const Prim = () => {
     mstNodes.add(1);
     addEdges(1);
 
-    while (mstNodes.size < nodes.length) {
+    while (mstNodes.size < nodes.current.length) {
       edgeQueue.sort((a, b) => a.weight - b.weight);
       const minEdge = edgeQueue.shift();
 
@@ -134,6 +132,43 @@ const Prim = () => {
     return mst;
   };
 
+  const generateRandomGraph = () => {
+    const numNodes = Math.floor(Math.random() * 5) + 5; // 5–9 nodes
+    const newNodes = [];
+    const radius = 100; // Radius of the circular layout
+    const center = { x: 0, y: 0 };
+
+    // Assign positions in a circle
+    for (let i = 1; i <= numNodes; i++) {
+      const angle = (2 * Math.PI * i) / numNodes;
+      newNodes.push({
+        id: i,
+        label: `Node ${i}`,
+        x: center.x + radius * Math.cos(angle),
+        y: center.y + radius * Math.sin(angle),
+      });
+    }
+
+    // Generate random edges (same as before)
+    const newEdges = [];
+    for (let i = 1; i <= numNodes; i++) {
+      for (let j = i + 1; j <= numNodes; j++) {
+        if (Math.random() > 0.5) {
+          const weight = Math.floor(Math.random() * 10) + 1;
+          newEdges.push({
+            id: `${i}-${j}`,
+            from: i,
+            to: j,
+            label: `${weight}`,
+            weight,
+          });
+        }
+      }
+    }
+
+    return { newNodes, newEdges };
+  };
+
   const handleSubmit = () => {
     const correctSet = new Set(mstEdges);
     const correctNodes = new Set();
@@ -144,7 +179,7 @@ const Prim = () => {
 
     let correctCount = 0;
     selectedEdges.forEach((edgeId) => {
-      const edge = edges.get(edgeId);
+      const edge = edges.current.get(edgeId);
       if (!edge) return; // Skip if edge doesn't exist
 
       if (correctSet.has(edgeId)) {
@@ -159,12 +194,12 @@ const Prim = () => {
       }
     });
 
-    // For every edge in the MST not selected by the user, ensure it is shown as green.
+    // For every edge in the MST not selected by the user, ensure it retains its original color.
     mstEdges.forEach((edgeId) => {
       if (!selectedEdges.has(edgeId)) {
         const originalColor = originalEdgeColors.get(edgeId) || "#aaa";
         updateEdgeColor(edgeId, originalColor); // reset edge color
-        const edge = edges.get(edgeId);
+        const edge = edges.current.get(edgeId);
         if (edge) {
           correctNodes.add(edge.from);
           correctNodes.add(edge.to);
@@ -173,6 +208,24 @@ const Prim = () => {
     });
 
     setFeedback(`You got ${correctCount} out of ${mstEdges.length} correct!`);
+
+    // Move to another graph if all answers are correct
+    if (correctCount === mstEdges.length) {
+      setTimeout(() => {
+        alert("All answers are correct! Moving to another graph...");
+        // Generate new graph data as arrays
+        const { newNodes, newEdges } = generateRandomGraph();
+        // Clear existing data and add new nodes/edges
+        nodes.current.clear();
+        edges.current.clear();
+        nodes.current.add(newNodes);
+        edges.current.add(newEdges);
+        // Recalculate MST with the updated edges DataSet
+        setMstEdges(computeMST(edges.current));
+        // Reset UI elements
+        handleReset();
+      }, 1000);
+    }
   };
 
   const handleReset = () => {
@@ -180,12 +233,12 @@ const Prim = () => {
     setFeedback("");
     setOriginalEdgeColors(new Map()); // Reset original edge colors
 
-    edges.forEach((edge) => {
+    edges.current.forEach((edge) => {
       const originalColor = "#aaa";
       updateEdgeColor(edge.id, originalColor);
     });
 
-    nodes.forEach((node) => updateNodeColor(node.id, undefined));
+    nodes.current.forEach((node) => updateNodeColor(node.id, undefined));
     networkRef.current.unselectAll();
   };
 
