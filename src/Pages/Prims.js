@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import NavBar from "../Components/Navbar";
 import { DataSet, Network } from "vis-network/standalone/esm/vis-network";
+import "../styles/algorithm.css";
+import Button from "react-bootstrap/Button";
 
 const Prim = () => {
   const containerRef = useRef(null);
@@ -13,11 +15,11 @@ const Prim = () => {
 
   const nodes = useRef(
     new DataSet([
-      { id: 1, label: "Node 1" },
-      { id: 2, label: "Node 2" },
-      { id: 3, label: "Node 3" },
-      { id: 4, label: "Node 4" },
-      { id: 5, label: "Node 5" },
+      { id: 1, label: "A" },
+      { id: 2, label: "B" },
+      { id: 3, label: "C" },
+      { id: 4, label: "D" },
+      { id: 5, label: "E" },
     ])
   );
 
@@ -149,10 +151,11 @@ const Prim = () => {
       });
     }
 
-    // Generate random edges (same as before)
+    // Generate random edges (limit to 7 edges)
     const newEdges = [];
-    for (let i = 1; i <= numNodes; i++) {
-      for (let j = i + 1; j <= numNodes; j++) {
+    let edgeCount = 0;
+    for (let i = 1; i <= numNodes && edgeCount < 7; i++) {
+      for (let j = i + 1; j <= numNodes && edgeCount < 7; j++) {
         if (Math.random() > 0.5) {
           const weight = Math.floor(Math.random() * 10) + 1;
           newEdges.push({
@@ -162,6 +165,7 @@ const Prim = () => {
             label: `${weight}`,
             weight,
           });
+          edgeCount++;
         }
       }
     }
@@ -212,7 +216,7 @@ const Prim = () => {
     // Move to another graph if all answers are correct
     if (correctCount === mstEdges.length) {
       setTimeout(() => {
-        alert("All answers are correct! Moving to another graph...");
+        alert("All answers are correct!");
         // Generate new graph data as arrays
         const { newNodes, newEdges } = generateRandomGraph();
         // Clear existing data and add new nodes/edges
@@ -243,18 +247,26 @@ const Prim = () => {
   };
 
   return (
-    <div>
+    <div className="algoContainer">
       <NavBar />
-      <h2>Guess the Minimum Spanning Tree</h2>
-      <div
-        ref={containerRef}
-        style={{ height: "450px", border: "1px solid black" }}
-      />
-      <button onClick={handleSubmit}>Submit Guess</button>
-      <button onClick={handleReset} style={{ marginLeft: "10px" }}>
+      <div className="title">
+        <h2>Guess the Minimum Spanning Tree</h2>
+      </div>
+
+      <div className="graph-container">
+        <div className="graph" ref={containerRef} />
+      </div>
+      <Button className="btn" variant="success" onClick={handleSubmit}>
+        Submit
+      </Button>
+      <Button className="btn" variant="danger" onClick={handleReset}>
         Reset
-      </button>
-      <p>{feedback}</p>
+      </Button>
+      <Button className="btn" variant="primary" onClick={generateRandomGraph}>
+        Skip
+      </Button>
+
+      <p className="feedback">{feedback}</p>
     </div>
   );
 };
