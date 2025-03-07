@@ -138,15 +138,15 @@ const Prim = () => {
     const correctSet = new Set(mstEdges);
     const correctNodes = new Set();
     const wrongNodes = new Set();
-  
+
     console.log(mstEdges);
     console.log(selectedEdges);
-  
+
     let correctCount = 0;
     selectedEdges.forEach((edgeId) => {
       const edge = edges.get(edgeId);
       if (!edge) return; // Skip if edge doesn't exist
-  
+
       if (correctSet.has(edgeId)) {
         updateEdgeColor(edgeId, "#0f0"); // green - correct edge
         correctNodes.add(edge.from);
@@ -158,11 +158,12 @@ const Prim = () => {
         wrongNodes.add(edge.to);
       }
     });
-  
+
     // For every edge in the MST not selected by the user, ensure it is shown as green.
     mstEdges.forEach((edgeId) => {
-      if (!selectedEdges.has(edgeId)) {  // Changed from mstEdges to edgeId
-        updateEdgeColor(edgeId, "#0f0"); // green - correct
+      if (!selectedEdges.has(edgeId)) {
+        const originalColor = originalEdgeColors.get(edgeId) || "#aaa";
+        updateEdgeColor(edgeId, originalColor); // reset edge color
         const edge = edges.get(edgeId);
         if (edge) {
           correctNodes.add(edge.from);
@@ -173,13 +174,14 @@ const Prim = () => {
 
     setFeedback(`You got ${correctCount} out of ${mstEdges.length} correct!`);
   };
-  
+
   const handleReset = () => {
     setSelectedEdges(new Set());
     setFeedback("");
+    setOriginalEdgeColors(new Map()); // Reset original edge colors
 
     edges.forEach((edge) => {
-      const originalColor = originalEdgeColors.get(edge.id) || "#aaa";
+      const originalColor = "#aaa";
       updateEdgeColor(edge.id, originalColor);
     });
 
@@ -189,18 +191,18 @@ const Prim = () => {
 
   return (
     <div>
-    <NavBar />
-    <h2>Guess the Minimum Spanning Tree</h2>
-    <div
-      ref={containerRef}
-      style={{ height: "450px", border: "1px solid black" }}
-    />
-    <button onClick={handleSubmit}>Submit Guess</button>
-    <button onClick={handleReset} style={{ marginLeft: "10px" }}>
-      Reset
-    </button>
-    <p>{feedback}</p>
-  </div>
+      <NavBar />
+      <h2>Guess the Minimum Spanning Tree</h2>
+      <div
+        ref={containerRef}
+        style={{ height: "450px", border: "1px solid black" }}
+      />
+      <button onClick={handleSubmit}>Submit Guess</button>
+      <button onClick={handleReset} style={{ marginLeft: "10px" }}>
+        Reset
+      </button>
+      <p>{feedback}</p>
+    </div>
   );
 };
 
