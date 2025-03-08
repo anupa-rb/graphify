@@ -137,7 +137,7 @@ const Prim = () => {
   const generateRandomGraph = () => {
     const numNodes = Math.floor(Math.random() * 5) + 5; // 5–9 nodes
     const newNodes = [];
-    const radius = 100; // Radius of the circular layout
+    const radius = 100;
     const center = { x: 0, y: 0 };
 
     // Assign positions in a circle
@@ -151,23 +151,56 @@ const Prim = () => {
       });
     }
 
-    // Generate random edges (limit to 7 edges)
+    // Generate a spanning tree (connected with n-1 edges)
     const newEdges = [];
-    let edgeCount = 0;
-    for (let i = 1; i <= numNodes && edgeCount < 7; i++) {
-      for (let j = i + 1; j <= numNodes && edgeCount < 7; j++) {
-        if (Math.random() > 0.5) {
-          const weight = Math.floor(Math.random() * 10) + 1;
-          newEdges.push({
-            id: `${i}-${j}`,
-            from: i,
-            to: j,
-            label: `${weight}`,
-            weight,
-          });
-          edgeCount++;
+    const inTree = new Set([1]); // Start with node 1
+
+    // Connect each node to the tree
+    for (let i = 2; i <= numNodes; i++) {
+      const possibleTargets = Array.from(inTree);
+      const target =
+        possibleTargets[Math.floor(Math.random() * possibleTargets.length)];
+      const weight = Math.floor(Math.random() * 10) + 1;
+      newEdges.push({
+        id: `${i}-${target}`,
+        from: i,
+        to: target,
+        label: `${weight}`,
+        weight,
+      });
+      inTree.add(i);
+    }
+
+    // Add additional edges up to 7 total
+    const existingEdges = new Set(newEdges.map((e) => e.id));
+    let edgeCount = newEdges.length;
+
+    // Collect all possible non-tree edges
+    const possibleEdges = [];
+    for (let i = 1; i <= numNodes; i++) {
+      for (let j = i + 1; j <= numNodes; j++) {
+        const edgeId = `${i}-${j}`;
+        if (!existingEdges.has(edgeId)) {
+          possibleEdges.push({ from: i, to: j });
         }
       }
+    }
+
+    // Shuffle and add edges until we reach 7 or run out
+    possibleEdges.sort(() => Math.random() - 0.5);
+    for (const edge of possibleEdges) {
+      if (edgeCount >= 7) break;
+      const weight = Math.floor(Math.random() * 10) + 1;
+      const edgeId = `${edge.from}-${edge.to}`;
+      newEdges.push({
+        id: edgeId,
+        from: edge.from,
+        to: edge.to,
+        label: `${weight}`,
+        weight,
+      });
+      existingEdges.add(edgeId);
+      edgeCount++;
     }
 
     return { newNodes, newEdges };
@@ -231,7 +264,22 @@ const Prim = () => {
       }, 1000);
     }
   };
-
+  const handleSkip = () => {
+    // Move to another graph if all answers are correct
+    setTimeout(() => {
+      // Generate new graph data as arrays
+      const { newNodes, newEdges } = generateRandomGraph();
+      // Clear existing data and add new nodes/edges
+      nodes.current.clear();
+      edges.current.clear();
+      nodes.current.add(newNodes);
+      edges.current.add(newEdges);
+      // Recalculate MST with the updated edges DataSet
+      setMstEdges(computeMST(edges.current));
+      // Reset UI elements
+      handleReset();
+    }, 1000);
+  };
   const handleReset = () => {
     setSelectedEdges(new Set());
     setFeedback("");
@@ -262,7 +310,7 @@ const Prim = () => {
       <Button className="btn" variant="danger" onClick={handleReset}>
         Reset
       </Button>
-      <Button className="btn" variant="primary" onClick={generateRandomGraph}>
+      <Button className="btn" variant="primary" onClick={handleSkip}>
         Skip
       </Button>
 
