@@ -30,9 +30,9 @@
 graphify/
 ├── src/                    # Source code directory
 │   ├── Components/         # Reusable React components
-│   │   ├── ChatbotComponent.js    # Chatbot with algorithm explanations
-│   │   └── NavBar.js             # Navigation bar with dropdown
+│   │   └── NavBar.js              # Navigation bar with dropdown
 │   ├── Pages/             # Page components for different routes
+│   │   ├── ChatBot.js            # Chatbot with algorithm explanations
 │   │   ├── Dijktras.js           # Dijkstra's algorithm page
 │   │   ├── Prims.js              # Prim's algorithm page
 │   │   ├── Kruskals.js           # Kruskal's algorithm page
@@ -43,9 +43,21 @@ graphify/
 │   │   ├── ChatBot.css           # Chatbot styles
 │   │   ├── LearnMore.css         # Learn More page styles
 │   │   └── styles.css            # General styles (e.g., Navbar)
-│   └── Router.js          # Routing configuration
+│   ├── Routes/            # Routing configuration
+│       └── Route.js              # Main route file
+│   
 ├── public/                # Public assets
 │   ├── index.html                # HTML entry point
-│   └── logo.png                  # (Placeholder) Graphify logo
 ├── package.json           # Dependencies and scripts
 └── README.md              # Project documentation
+
+---
+
+## 🎯 Getting Started  
+
+To run this project on your local machine, follow these steps:  
+
+### 1️⃣ Clone the Repository  
+```bash
+git clone https://github.com/anupa-rb/graphify.git
+cd graphify
