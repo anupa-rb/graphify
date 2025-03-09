@@ -47,7 +47,7 @@ const Kruskal = () => {
     edges.current.clear();
     nodes.current.add(initialNodes);
     edges.current.add(initialEdges);
-    
+
     const data = { nodes: nodes.current, edges: edges.current };
     const options = {
       edges: {
@@ -147,34 +147,32 @@ const Kruskal = () => {
   };
 
   const generateRandomGraph = () => {
-    const numNodes = Math.floor(Math.random() * 5) + 5;
-    const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numNodes = Math.floor(Math.random() * 2) + 5; // 5–6 nodes
     const newNodes = [];
     const radius = 100;
     const center = { x: 0, y: 0 };
+    const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    // Generate nodes
+    // Assign positions in a circle
     for (let i = 1; i <= numNodes; i++) {
       const angle = (2 * Math.PI * i) / numNodes;
       newNodes.push({
         id: i,
-        label: labels[i - 1],
+        label: labels[i - 1], // Use letters for labels
         x: center.x + radius * Math.cos(angle),
         y: center.y + radius * Math.sin(angle),
       });
     }
 
-    // Generate spanning tree
+    // Generate a spanning tree (connected with n-1 edges)
     const newEdges = [];
-    const parent = {};
-    const rank = {};
-    newNodes.forEach((node) => {
-      parent[node.id] = node.id;
-      rank[node.id] = 0;
-    });
+    const inTree = new Set([1]); // Start with node 1
 
+    // Connect each node to the tree
     for (let i = 2; i <= numNodes; i++) {
-      const target = Math.floor(Math.random() * (i - 1)) + 1;
+      const possibleTargets = Array.from(inTree);
+      const target =
+        possibleTargets[Math.floor(Math.random() * possibleTargets.length)];
       const weight = Math.floor(Math.random() * 10) + 1;
       newEdges.push({
         id: `${i}-${target}`,
@@ -183,32 +181,39 @@ const Kruskal = () => {
         label: `${weight}`,
         weight,
       });
-      union(parent, rank, i, target);
+      inTree.add(i);
     }
 
-    // Add additional edges
-    const existingEdges = new Set(newEdges.map((e) => e.id));
+    // Add additional edges up to 7 total
+    const existingEdges = new Set(newEdges.map((e) => `${e.from}-${e.to}`));
     let edgeCount = newEdges.length;
 
-    while (edgeCount < 7) {
-      const from = Math.floor(Math.random() * numNodes) + 1;
-      const to = Math.floor(Math.random() * numNodes) + 1;
-      if (
-        from !== to &&
-        !existingEdges.has(`${from}-${to}`) &&
-        !existingEdges.has(`${to}-${from}`)
-      ) {
-        const weight = Math.floor(Math.random() * 10) + 1;
-        newEdges.push({
-          id: `${from}-${to}`,
-          from,
-          to,
-          label: `${weight}`,
-          weight,
-        });
-        existingEdges.add(`${from}-${to}`);
-        edgeCount++;
+    // Collect all possible non-tree edges
+    const possibleEdges = [];
+    for (let i = 1; i <= numNodes; i++) {
+      for (let j = i + 1; j <= numNodes; j++) {
+        const edgeId = `${i}-${j}`;
+        if (!existingEdges.has(edgeId) && !existingEdges.has(`${j}-${i}`)) {
+          possibleEdges.push({ from: i, to: j });
+        }
       }
+    }
+
+    // Shuffle and add edges until we reach 7 or run out
+    possibleEdges.sort(() => Math.random() - 0.5);
+    for (const edge of possibleEdges) {
+      if (edgeCount >= 7) break;
+      const weight = Math.floor(Math.random() * 10) + 1;
+      const edgeId = `${edge.from}-${edge.to}`;
+      newEdges.push({
+        id: edgeId,
+        from: edge.from,
+        to: edge.to,
+        label: `${weight}`,
+        weight,
+      });
+      existingEdges.add(edgeId);
+      edgeCount++;
     }
 
     return { newNodes, newEdges };
@@ -316,14 +321,19 @@ const Kruskal = () => {
       }, 1000);
     }
   };
+
   const handleReset = () => {
     setSelectedEdges(new Set());
     setFeedback("");
-    edges.current.forEach((edge) =>
-      updateEdgeColor(edge.id, originalEdgeColors.get(edge.id) || "#aaa")
-    );
+    setOriginalEdgeColors(new Map());
+    edges.current.forEach((edge) => updateEdgeColor(edge.id, "#aaa"));
+    nodes.current.forEach((node) => updateNodeColor(node.id, "#fff"));
     networkRef.current.unselectAll();
-    if (mode === "visualize") visualizeStep(0);
+
+    if (mode === "visualize") {
+      setCurrentStep(0);
+      setIsRunning(false);
+    }
   };
 
   const handleSkip = () => {
@@ -343,6 +353,11 @@ const Kruskal = () => {
       edges.current.update({ id: edgeId, color: { color } });
       networkRef.current.redraw();
     }
+  };
+
+  const updateNodeColor = (nodeId, color) => {
+    nodes.current.update({ id: nodeId, color: { background: color } });
+    networkRef.current.redraw();
   };
 
   const handlePlayPause = () => {
@@ -429,6 +444,8 @@ const Kruskal = () => {
           <div className="status">
             Step {currentStep + 1} of {steps.length}
           </div>
+          <br />
+          <br />
         </div>
       )}
     </div>

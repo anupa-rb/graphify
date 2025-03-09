@@ -3,21 +3,18 @@ import NavBar from "../Components/Navbar";
 import { DataSet, Network } from "vis-network/standalone/esm/vis-network";
 import "../styles/algorithm.css";
 import Button from "react-bootstrap/Button";
-// import Heap from "heap-js";
 
 const Dijkstra = () => {
   const containerRef = useRef(null);
   const networkRef = useRef(null);
-const [mode, setMode] = useState("quiz");
-
+  const [mode, setMode] = useState("quiz");
   const [shortestPathEdges, setShortestPathEdges] = useState([]);
   const [selectedEdges, setSelectedEdges] = useState(new Set());
   const [feedback, setFeedback] = useState("");
   const [originalEdgeColors, setOriginalEdgeColors] = useState(new Map());
-
   const [isRunning, setIsRunning] = useState(false);
-    const [currentStep, setCurrentStep] = useState(0);
-    const [steps, setSteps] = useState([]);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [steps, setSteps] = useState([]);
 
   const nodes = useRef(
     new DataSet([
@@ -51,15 +48,12 @@ const [mode, setMode] = useState("quiz");
     const network = new Network(containerRef.current, data, options);
     networkRef.current = network;
 
-    // Set the shortest path edges from start node (1) to end node (5)
-    const computedShortestPath = setShortestPathEdges(computeDijkstra(1, 5, edges.current));
+    const computedShortestPath = computeDijkstra(1, 5, edges.current);
     setShortestPathEdges(computedShortestPath);
-    // setSteps(computeDijkstraSteps(edges.current));
- console.log(shortestPathEdges);
-    visualizeStep(0);
-
+    setSteps(computeDijkstraSteps(1, 5, edges.current));
+    
     const handleSelectEdge = (params) => {
-      if (mode === "quiz") {
+      if (mode === "quiz" && params.edges.length > 0) {
         const edgeId = params.edges[0];
         toggleEdgeSelection(edgeId);
       }
@@ -79,35 +73,21 @@ const [mode, setMode] = useState("quiz");
     }
 
     const step = steps[stepIndex];
+    edges.current.forEach((edge) => updateEdgeColor(edge.id, "#aaa"));
+    nodes.current.forEach((node) => updateNodeColor(node.id, "#fff"));
 
-    // Reset all edges
-    edges.current.forEach((edge) => {
-      updateEdgeColor(edge.id, "#aaa");
-    });
-
-    // Highlight current edge
     if (step?.currentEdge) {
       updateEdgeColor(step.currentEdge.id, "#f00");
     }
-
-    // Show shortest path edges
     if (step?.shortestPathEdges) {
-      step.shortestPathEdges.forEach((edgeId) => {
-        updateEdgeColor(edgeId, "#0f0");
-      });
+      step.shortestPathEdges.forEach((edgeId) => updateEdgeColor(edgeId, "#0f0"));
     }
-
-    // Highlight candidate edges
     if (step?.candidates) {
-      step.candidates.forEach((edge) => {
-        updateEdgeColor(edge.id, "#ff0");
-      });
+      step.candidates.forEach((edgeId) => updateEdgeColor(edgeId, "#ff0"));
     }
-
-    // Update node colors
-    nodes.current.forEach((node) => {
-      updateNodeColor(node.id, step?.visited?.has(node.id) ? "#7f7" : "#fff");
-    });
+    if (step?.visited) {
+      step.visited.forEach((nodeId) => updateNodeColor(nodeId, "#7f7"));
+    }
 
     setCurrentStep(stepIndex);
   };
@@ -117,149 +97,145 @@ const [mode, setMode] = useState("quiz");
       const updated = new Set(prev);
       if (updated.has(edgeId)) {
         updated.delete(edgeId);
-        updateEdgeColor(edgeId, originalEdgeColors.get(edgeId) || "#aaa"); // reset edge color
+        updateEdgeColor(edgeId, originalEdgeColors.get(edgeId) || "#aaa");
       } else {
-        if (!originalEdgeColors.has(edgeId)) {
-          const edge = edges.current.get(edgeId);
-          if (edge) {
-            const edgeColor = edge.color?.color || "#aaa"; // Default to the normal gray if undefined
-            setOriginalEdgeColors((prevColors) =>
-              new Map(prevColors).set(edgeId, edgeColor)
-            );
-          }
+        const edge = edges.current.get(edgeId);
+        if (edge) {
+          const edgeColor = edge.color?.color || "#aaa";
+          setOriginalEdgeColors((prevColors) => new Map(prevColors).set(edgeId, edgeColor));
+          updated.add(edgeId);
+          updateEdgeColor(edgeId, "#00f");
         }
-        updated.add(edgeId);
-        updateEdgeColor(edgeId, "#00f"); // blue - selected edge
       }
       return updated;
     });
   };
 
   const updateEdgeColor = (edgeId, color) => {
-    const edge = edges.current.get(edgeId);
-    if (edge) {
-      edges.current.update({ id: edgeId, color: { color } });
-      networkRef.current.redraw();
-    }
+    edges.current.update({ id: edgeId, color: { color } });
+    networkRef.current?.redraw();
   };
 
   const updateNodeColor = (nodeId, color) => {
     nodes.current.update({ id: nodeId, color: { background: color } });
-    networkRef.current.redraw();
+    networkRef.current?.redraw();
   };
 
-  const computeDijkstra = (start, end, edges) => {
+  const computeDijkstra = (start, end, edgesData) => {
     const distances = {};
     const previous = {};
-    const edgeQueue = [];
-
-    // Initialize distances
-    edges.forEach((edge) => {
+    const unvisited = new Set();
+    
+    edgesData.forEach((edge) => {
+      unvisited.add(edge.from);
+      unvisited.add(edge.to);
       distances[edge.from] = Infinity;
       distances[edge.to] = Infinity;
     });
 
     distances[start] = 0;
-    edgeQueue.push({ node: start, distance: 0 });
+    while (unvisited.size > 0) {
+      const current = Array.from(unvisited).reduce((minNode, node) => 
+        distances[node] < distances[minNode] ? node : minNode
+      );
+      
+      if (current === end) break;
+      if (distances[current] === Infinity) break;
 
-    while (edgeQueue.length > 0) {
-      edgeQueue.sort((a, b) => a.distance - b.distance);
-      const { node, distance } = edgeQueue.shift();
-
-      edges.forEach((edge) => {
-        if (edge.from === node || edge.to === node) {
-          const neighbor = edge.from === node ? edge.to : edge.from;
-          const newDist = distance + edge.weight;
-          if (newDist < distances[neighbor]) {
-            distances[neighbor] = newDist;
-            previous[neighbor] = edge.id;
-            edgeQueue.push({ node: neighbor, distance: newDist });
+      unvisited.delete(current);
+      
+      edgesData.forEach((edge) => {
+        if (edge.from === current || edge.to === current) {
+          const neighbor = edge.from === current ? edge.to : edge.from;
+          if (unvisited.has(neighbor)) {
+            const newDist = distances[current] + edge.weight;
+            if (newDist < distances[neighbor]) {
+              distances[neighbor] = newDist;
+              previous[neighbor] = edge.id;
+            }
           }
         }
       });
     }
-    console.log(distances);
-  };
-    const computeDijkstraSteps = (start, end, edges) => {
-      const distances = {};
-      const previous = {};
-      const edgeQueue = [];
-      const steps = [];
 
-      edges.forEach((edge) => {
-        distances[edge.from] = Infinity;
-        distances[edge.to] = Infinity;
-      });
-
-      distances[start] = 0;
-  edgeQueue.push({ node: start, distance: 0 });
-
-  while (edgeQueue.length > 0) {
-    edgeQueue.sort((a, b) => a.distance - b.distance);
-    const { node, distance } = edgeQueue.shift();
-
-    edges.forEach((edge) => {
-      if (edge.from === node || edge.to === node) {
-        const neighbor = edge.from === node ? edge.to : edge.from;
-        const newDist = distance + edge.weight;
-        if (newDist < distances[neighbor]) {
-          distances[neighbor] = newDist;
-          previous[neighbor] = edge.id;
-          edgeQueue.push({ node: neighbor, distance: newDist });
-
-          // Add step for visualization
-          steps.push({
-            visited: new Set(Object.keys(distances).filter((n) => distances[n] !== Infinity)),
-            candidates: edgeQueue.map((e) => edges.get(e.node)),
-            currentEdge: edge,
-            shortestPathEdges: Object.values(previous),
-          });
-        }
-      }
-    });
-  }
-
-  // return steps;
-
-    // };
-
-    // Reconstruct the shortest path
     const path = [];
     let current = end;
     while (previous[current]) {
-      path.push(previous[current]);
-      current = edges.get(previous[current]).from;
+      path.unshift(previous[current]);
+      const edge = edgesData.get(previous[current]);
+      current = edge.from === current ? edge.to : edge.from;
     }
-    return path.reverse(); // Return the path from start to end
+    return path;
+  };
+
+  const computeDijkstraSteps = (start, end, edgesData) => {
+    const distances = {};
+    const previous = {};
+    const unvisited = new Set();
+    const steps = [];
+
+    edgesData.forEach((edge) => {
+      unvisited.add(edge.from);
+      unvisited.add(edge.to);
+      distances[edge.from] = Infinity;
+      distances[edge.to] = Infinity;
+    });
+
+    distances[start] = 0;
+    while (unvisited.size > 0) {
+      const current = Array.from(unvisited).reduce((minNode, node) => 
+        distances[node] < distances[minNode] ? node : minNode
+      );
+
+      unvisited.delete(current);
+      
+      edgesData.forEach((edge) => {
+        if (edge.from === current || edge.to === current) {
+          const neighbor = edge.from === current ? edge.to : edge.from;
+          if (unvisited.has(neighbor)) {
+            const newDist = distances[current] + edge.weight;
+            if (newDist < distances[neighbor]) {
+              distances[neighbor] = newDist;
+              previous[neighbor] = edge.id;
+              
+              steps.push({
+                visited: new Set(unvisited),
+                candidates: edgesData.getIds().filter(id => 
+                  unvisited.has(edgesData.get(id).from) || unvisited.has(edgesData.get(id).to)
+                ),
+                currentEdge: edge,
+                shortestPathEdges: Object.values(previous)
+              });
+            }
+          }
+        }
+      });
+    }
+    return steps;
   };
 
   const generateRandomGraph = () => {
-    const numNodes = Math.floor(Math.random() * 5) + 5; // 5–9 nodes
+    const numNodes = Math.floor(Math.random() * 5) + 5;
     const newNodes = [];
     const radius = 100;
     const center = { x: 0, y: 0 };
     const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-// Assign positions in a circle
-for (let i = 1; i <= numNodes; i++) {
-  const angle = (2 * Math.PI * i) / numNodes;
-  newNodes.push({
-    id: i,
-    label: labels[i - 1], // Use letters for labels
-    x: center.x + radius * Math.cos(angle),
-    y: center.y + radius * Math.sin(angle),
-  });
-}
+    for (let i = 1; i <= numNodes; i++) {
+      const angle = (2 * Math.PI * i) / numNodes;
+      newNodes.push({
+        id: i,
+        label: labels[i - 1],
+        x: center.x + radius * Math.cos(angle),
+        y: center.y + radius * Math.sin(angle),
+      });
+    }
 
-    // Generate a spanning tree (connected with n-1 edges)
     const newEdges = [];
-    const inTree = new Set([1]); // Start with node 1
-
-    // Connect each node to the tree
+    const connected = new Set([1]);
     for (let i = 2; i <= numNodes; i++) {
-      const possibleTargets = Array.from(inTree);
-      const target =
-        possibleTargets[Math.floor(Math.random() * possibleTargets.length)];
+      const targets = Array.from(connected);
+      const target = targets[Math.floor(Math.random() * targets.length)];
       const weight = Math.floor(Math.random() * 10) + 1;
       newEdges.push({
         id: `${i}-${target}`,
@@ -268,126 +244,45 @@ for (let i = 1; i <= numNodes; i++) {
         label: `${weight}`,
         weight,
       });
-      inTree.add(i);
+      connected.add(i);
     }
 
-    // Add additional edges up to 7 total
-    const existingEdges = new Set(newEdges.map((e) => e.id));
-    let edgeCount = newEdges.length;
-
-    // Collect all possible non-tree edges
-    const possibleEdges = [];
-    for (let i = 1; i <= numNodes; i++) {
-      for (let j = i + 1; j <= numNodes; j++) {
-        const edgeId = `${i}-${j}`;
-        if (!existingEdges.has(edgeId)) {
-          possibleEdges.push({ from: i, to: j });
-        }
-      }
-    }
-
-    // Shuffle and add edges until we reach 7 or run out
-    possibleEdges.sort(() => Math.random() - 0.5);
-    for (const edge of possibleEdges) {
-      if (edgeCount >= 7) break;
-      const weight = Math.floor(Math.random() * 10) + 1;
-      const edgeId = `${edge.from}-${edge.to}`;
-      newEdges.push({
-        id: edgeId,
-        from: edge.from,
-        to: edge.to,
-        label: `${weight}`,
-        weight,
-      });
-      existingEdges.add(edgeId);
-      edgeCount++;
-    }
-
-    return { newNodes, newEdges };
+    nodes.current.clear();
+    edges.current.clear();
+    nodes.current.add(newNodes);
+    edges.current.add(newEdges);
+    
+    const newPath = computeDijkstra(1, numNodes, edges.current);
+    setShortestPathEdges(newPath);
+    setSteps(computeDijkstraSteps(1, numNodes, edges.current));
   };
 
   const handleSubmit = () => {
-    console.log("shortestPathEdges:", shortestPathEdges);
-    console.log("selectedEdges:", selectedEdges);
-    if (!Array.isArray(shortestPathEdges) || !Array.isArray(selectedEdges)) {
-      console.error("Expected arrays, but got invalid data types.");
-      return;
-    }
-    console.log("hello");
     const correctSet = new Set(shortestPathEdges);
-    const correctNodes = new Set();
-    const wrongNodes = new Set();
-
-    console.log(shortestPathEdges);
-    console.log(selectedEdges);
-
     let correctCount = 0;
 
     selectedEdges.forEach((edgeId) => {
-      const edge = edges.current.get(edgeId);
-      if (!edge) return; // Skip if edge doesn't exist
-
       if (correctSet.has(edgeId)) {
-        updateEdgeColor(edgeId, "#0f0"); // green - correct edge
-        correctNodes.add(edge.from);
-        correctNodes.add(edge.to);
-
+        updateEdgeColor(edgeId, "#0f0");
         correctCount++;
       } else {
-        updateEdgeColor(edgeId, "#f00"); // red - wrong edge
-        wrongNodes.add(edge.from);
-        wrongNodes.add(edge.to);
-      }
-    });
-     // For every edge in the shortest path not selected by the user, ensure it retains its original color.
-     shortestPathEdges.forEach((edgeId) => {
-      if (!selectedEdges.has(edgeId)) {
-        const originalColor = originalEdgeColors.get(edgeId) || "#aaa";
-        updateEdgeColor(edgeId, originalColor); // reset edge color
-        const edge = edges.current.get(edgeId);
-        if (edge) {
-          correctNodes.add(edge.from);
-          correctNodes.add(edge.to);
-        }
+        updateEdgeColor(edgeId, "#f00");
       }
     });
 
     setFeedback(`You got ${correctCount} out of ${shortestPathEdges.length} correct!`);
 
-    // Move to another graph if all answers are correct
     if (correctCount === shortestPathEdges.length) {
       setTimeout(() => {
         alert("All answers are correct!");
-        // Generate new graph data as arrays
-        const { newNodes, newEdges } = generateRandomGraph();
-        // Clear existing data and add new nodes/edges
-        nodes.current.clear();
-        edges.current.clear();
-        nodes.current.add(newNodes);
-        edges.current.add(newEdges);
-        // Recalculate shortest path with the updated edges DataSet
-        setShortestPathEdges(computeDijkstra(1, newNodes.length, edges.current));
-        // Reset UI elements
+        generateRandomGraph();
         handleReset();
       }, 1000);
     }
   };
 
   const handleSkip = () => {
-    // Generate new graph data as arrays
-    const { newNodes, newEdges } = generateRandomGraph();
-    // Clear existing data and add new nodes/edges
-    nodes.current.clear();
-    edges.current.clear();
-    nodes.current.add(newNodes);
-    edges.current.add(newEdges);
-    // Recalculate MST with the updated edges DataSet
-    setShortestPathEdges(computeDijkstra(edges.current));
-    // Regenerate both MST and steps
-    const newMST = computeDijkstra(edges.current);
-    setShortestPathEdges(newMST);
-    setSteps(computeDijkstraSteps(edges.current));
-    // Reset UI elements
+    generateRandomGraph();
     handleReset();
   };
 
@@ -397,11 +292,12 @@ for (let i = 1; i <= numNodes; i++) {
     setOriginalEdgeColors(new Map());
     edges.current.forEach((edge) => updateEdgeColor(edge.id, "#aaa"));
     nodes.current.forEach((node) => updateNodeColor(node.id, "#fff"));
-    networkRef.current.unselectAll();
+    networkRef.current?.unselectAll();
 
     if (mode === "visualize") {
       setCurrentStep(0);
       setIsRunning(false);
+      visualizeStep(0);
     }
   };
 
@@ -432,6 +328,10 @@ for (let i = 1; i <= numNodes; i++) {
     }
   };
 
+  const getEdgeLabel = (edgeId) => {
+    const edge = edges.current.get(edgeId);
+    return edge ? `${edge.label} (A${edge.from}-A${edge.to})` : "";
+  };
 
   return (
     <div className="algoContainer">
@@ -439,23 +339,21 @@ for (let i = 1; i <= numNodes; i++) {
       <div className="title">
         <h2>Guess the Shortest Path (Dijkstra's Algorithm)</h2>
       </div>
-
       <div className="graph-container">
         <div className="graph" ref={containerRef} />
       </div>
       {mode === "quiz" ? (
         <div className="quiz-controls">
-      <Button className="btn" variant="success" onClick={handleSubmit}>
-        Submit
-      </Button>
-      <Button className="btn" variant="danger" onClick={handleReset}>
-        Reset
-      </Button>
-      <Button className="btn" variant="primary" onClick={handleSkip}>
-        Skip
-      </Button>
-
-      <Button variant="info" onClick={() => switchMode("visualize")}>
+          <Button className="btn" variant="success" onClick={handleSubmit}>
+            Submit
+          </Button>
+          <Button className="btn" variant="danger" onClick={handleReset}>
+            Reset
+          </Button>
+          <Button className="btn" variant="primary" onClick={handleSkip}>
+            Skip
+          </Button>
+          <Button variant="info" onClick={() => switchMode("visualize")}>
             Show Visualization
           </Button>
           <p className="feedback">{feedback}</p>
@@ -497,3 +395,5 @@ for (let i = 1; i <= numNodes; i++) {
 };
 
 export default Dijkstra;
+
+
