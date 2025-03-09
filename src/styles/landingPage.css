@@ -25,9 +25,10 @@
   font-weight: 1000;
   color: #f0f8ff;
   background: linear-gradient(to right, #ff00cc, #8103ff); /* Pink to Deep Blue */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
+  background-clip: text; /* Standard */
+  -webkit-background-clip: text; /* For Safari & Chrome */
+  -webkit-text-fill-color: transparent;
+  display: inline-block; /* Ensure gradient text is properly displayed */
 }
 .descriptionStyle {
   font-size: 20px;
