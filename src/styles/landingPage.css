@@ -24,7 +24,7 @@
   font-size: 50px;
   font-weight: 1000;
   color: #f0f8ff;
-  background: linear-gradient(to right, #ff00cc, #2d6df8); /* Pink to Deep Blue */
+  background: linear-gradient(to right, #ff00cc, #8103ff); /* Pink to Deep Blue */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
@@ -37,9 +37,7 @@
 }
 .btn {
   margin: 10px;
-  background: #626060;
-  color: aliceblue;
-  border: none;
+    border: none;
 }
 .cardStyle {
   display: flex;
