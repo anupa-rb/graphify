@@ -8,7 +8,7 @@ import Heap from "heap-js";
 const Prim = () => {
   const containerRef = useRef(null);
   const networkRef = useRef(null);
-  const [mode, setMode] = useState("quiz"); // 'quiz' or 'visualize'
+  
   const [mstEdges, setMstEdges] = useState([]);
   const [selectedEdges, setSelectedEdges] = useState(new Set());
   const [feedback, setFeedback] = useState("");

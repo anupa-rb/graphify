@@ -1,5 +1,4 @@
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-import Home from "../Pages/Home";
 import Prim from "../Pages/Prims";
 import Kruskal from "../Pages/Kruskals";
 import Dijktra from "../Pages/Dijktras";
@@ -12,12 +11,10 @@ const Router = () => {
     <BrowserRouter>
       <Switch></Switch>
       <Route path="/" component={LandingPage} exact/>
-      <Route path="/home" component={Home}/>
       <Route path="/prims" component={Prim} />
       <Route path="/kruskals" component={Kruskal} />
       <Route path="/dijkstras" component={Dijktra} />
       <Route path="/learnMore" component={LearnMore} />
-
     </BrowserRouter>
   );
 };
