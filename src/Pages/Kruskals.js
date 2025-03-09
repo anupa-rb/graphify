@@ -47,7 +47,7 @@ const Kruskal = () => {
     edges.current.clear();
     nodes.current.add(initialNodes);
     edges.current.add(initialEdges);
-
+    
     const data = { nodes: nodes.current, edges: edges.current };
     const options = {
       edges: {
