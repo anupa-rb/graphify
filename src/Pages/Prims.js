@@ -8,7 +8,7 @@ import Heap from "heap-js";
 const Prim = () => {
   const containerRef = useRef(null);
   const networkRef = useRef(null);
-  
+  const [mode, setMode] = useState("quiz"); // 'quiz' or 'visualize'
   const [mstEdges, setMstEdges] = useState([]);
   const [selectedEdges, setSelectedEdges] = useState(new Set());
   const [feedback, setFeedback] = useState("");
@@ -48,12 +48,11 @@ const Prim = () => {
         color: { color: "#aaa" },
         smooth: false,
       },
-      physics: {
-        enabled: true,
-        barnesHut: { avoidOverlap: 1 },
-      },
-      nodes: {
-        fixed: { x: true, y: true },
+      physics: false,
+      interaction: {
+        dragNodes: true, // Allow dragging nodes
+        dragView: true, // Allow dragging the view
+        zoomView: true, // Allow zooming the view
       },
     };
 
@@ -84,7 +83,7 @@ const Prim = () => {
 
   // Shared graph operations
   const generateRandomGraph = () => {
-    const numNodes = Math.floor(Math.random() * 5) + 5; // 5–9 nodes
+    const numNodes = Math.floor(Math.random() * 2) + 5; // 5–6 nodes
     const newNodes = [];
     const radius = 100;
     const center = { x: 0, y: 0 };
@@ -122,7 +121,7 @@ const Prim = () => {
     }
 
     // Add additional edges up to 7 total
-    const existingEdges = new Set(newEdges.map((e) => e.id));
+    const existingEdges = new Set(newEdges.map((e) => `${e.from}-${e.to}`));
     let edgeCount = newEdges.length;
 
     // Collect all possible non-tree edges
@@ -130,7 +129,7 @@ const Prim = () => {
     for (let i = 1; i <= numNodes; i++) {
       for (let j = i + 1; j <= numNodes; j++) {
         const edgeId = `${i}-${j}`;
-        if (!existingEdges.has(edgeId)) {
+        if (!existingEdges.has(edgeId) && !existingEdges.has(`${j}-${i}`)) {
           possibleEdges.push({ from: i, to: j });
         }
       }
@@ -248,7 +247,12 @@ const Prim = () => {
   };
 
   const visualizeStep = (stepIndex) => {
-    if (!steps || steps.length === 0 || stepIndex < 0 || stepIndex >= steps.length) {
+    if (
+      !steps ||
+      steps.length === 0 ||
+      stepIndex < 0 ||
+      stepIndex >= steps.length
+    ) {
       return;
     }
 

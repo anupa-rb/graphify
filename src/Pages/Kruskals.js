@@ -32,7 +32,7 @@ const Kruskal = () => {
       { id: 4, label: "D" },
       { id: 5, label: "E" },
     ];
-    
+
     const initialEdges = [
       { id: "1-2", from: 1, to: 2, label: "3", weight: 3 },
       { id: "1-3", from: 1, to: 3, label: "1", weight: 1 },
@@ -50,29 +50,29 @@ const Kruskal = () => {
 
     const data = { nodes: nodes.current, edges: edges.current };
     const options = {
-      edges: { 
-        font: { align: "top" }, 
+      edges: {
+        font: { align: "top" },
         color: { color: "#aaa" },
-        smooth: false
+        smooth: false,
       },
-      physics: false
+      physics: false,
     };
 
     const network = new Network(containerRef.current, data, options);
     networkRef.current = network;
-    
+
     const computedMST = computeKruskalMST(edges.current);
     setMstEdges(computedMST);
     setSteps(computeKruskalSteps(edges.current));
 
     network.on("selectEdge", handleEdgeSelect);
-    
+
     return () => network.destroy();
   };
 
   // Union-Find implementation
-  const find = (parent, i) => parent[i] === i ? i : find(parent, parent[i]);
-  
+  const find = (parent, i) => (parent[i] === i ? i : find(parent, parent[i]));
+
   const union = (parent, rank, x, y) => {
     const rootX = find(parent, x);
     const rootY = find(parent, y);
@@ -91,8 +91,8 @@ const Kruskal = () => {
     const sortedEdges = [...edgesArray].sort((a, b) => a.weight - b.weight);
     const parent = {};
     const rank = {};
-    
-    nodes.current.forEach(node => {
+
+    nodes.current.forEach((node) => {
       parent[node.id] = node.id;
       rank[node.id] = 0;
     });
@@ -118,7 +118,7 @@ const Kruskal = () => {
     const mstEdges = [];
     const rejectedEdges = [];
 
-    nodes.current.forEach(node => {
+    nodes.current.forEach((node) => {
       parent[node.id] = node.id;
       rank[node.id] = 0;
     });
@@ -139,7 +139,7 @@ const Kruskal = () => {
         currentEdge: edge,
         added,
         mstEdges: [...mstEdges],
-        rejectedEdges: [...rejectedEdges]
+        rejectedEdges: [...rejectedEdges],
       });
     }
 
@@ -168,7 +168,7 @@ const Kruskal = () => {
     const newEdges = [];
     const parent = {};
     const rank = {};
-    newNodes.forEach(node => {
+    newNodes.forEach((node) => {
       parent[node.id] = node.id;
       rank[node.id] = 0;
     });
@@ -187,19 +187,24 @@ const Kruskal = () => {
     }
 
     // Add additional edges
-    const existingEdges = new Set(newEdges.map(e => e.id));
+    const existingEdges = new Set(newEdges.map((e) => e.id));
     let edgeCount = newEdges.length;
 
     while (edgeCount < 7) {
       const from = Math.floor(Math.random() * numNodes) + 1;
       const to = Math.floor(Math.random() * numNodes) + 1;
-      if (from !== to && !existingEdges.has(`${from}-${to}`) && !existingEdges.has(`${to}-${from}`)) {
+      if (
+        from !== to &&
+        !existingEdges.has(`${from}-${to}`) &&
+        !existingEdges.has(`${to}-${from}`)
+      ) {
+        const weight = Math.floor(Math.random() * 10) + 1;
         newEdges.push({
           id: `${from}-${to}`,
           from,
           to,
-          label: `${Math.floor(Math.random() * 10) + 1}`,
-          weight: Math.floor(Math.random() * 10) + 1,
+          label: `${weight}`,
+          weight,
         });
         existingEdges.add(`${from}-${to}`);
         edgeCount++;
@@ -212,13 +217,13 @@ const Kruskal = () => {
   // Visualization functions
   const visualizeStep = (stepIndex) => {
     if (!steps.length || stepIndex < 0 || stepIndex >= steps.length) return;
-    
-    const step = steps[stepIndex];
-    edges.current.forEach(edge => updateEdgeColor(edge.id, "#aaa"));
 
-    step.mstEdges.forEach(edgeId => updateEdgeColor(edgeId, "#0f0"));
-    step.rejectedEdges.forEach(edgeId => updateEdgeColor(edgeId, "#f00"));
-    
+    const step = steps[stepIndex];
+    edges.current.forEach((edge) => updateEdgeColor(edge.id, "#aaa"));
+
+    step.mstEdges.forEach((edgeId) => updateEdgeColor(edgeId, "#0f0"));
+    step.rejectedEdges.forEach((edgeId) => updateEdgeColor(edgeId, "#f00"));
+
     if (step.currentEdge) {
       updateEdgeColor(step.currentEdge.id, step.added ? "#0f0" : "#f00");
     }
@@ -233,7 +238,7 @@ const Kruskal = () => {
   };
 
   const toggleEdgeSelection = (edgeId) => {
-    setSelectedEdges(prev => {
+    setSelectedEdges((prev) => {
       const updated = new Set(prev);
       if (updated.has(edgeId)) {
         updated.delete(edgeId);
@@ -241,7 +246,9 @@ const Kruskal = () => {
       } else {
         if (!originalEdgeColors.has(edgeId)) {
           const edge = edges.current.get(edgeId);
-          setOriginalEdgeColors(prev => new Map(prev).set(edgeId, edge.color?.color || "#aaa"));
+          setOriginalEdgeColors((prev) =>
+            new Map(prev).set(edgeId, edge.color?.color || "#aaa")
+          );
         }
         updated.add(edgeId);
         updateEdgeColor(edgeId, "#00f");
@@ -312,7 +319,7 @@ const Kruskal = () => {
   const handleReset = () => {
     setSelectedEdges(new Set());
     setFeedback("");
-    edges.current.forEach(edge => 
+    edges.current.forEach((edge) =>
       updateEdgeColor(edge.id, originalEdgeColors.get(edge.id) || "#aaa")
     );
     networkRef.current.unselectAll();
@@ -342,7 +349,7 @@ const Kruskal = () => {
     if (!isRunning && currentStep < steps.length - 1) {
       setIsRunning(true);
       const interval = setInterval(() => {
-        setCurrentStep(prev => {
+        setCurrentStep((prev) => {
           if (prev >= steps.length - 1) {
             clearInterval(interval);
             setIsRunning(false);
@@ -378,9 +385,15 @@ const Kruskal = () => {
 
       {mode === "quiz" ? (
         <div className="quiz-controls">
-          <Button variant="success" onClick={handleSubmit}>Submit</Button>
-          <Button variant="danger" onClick={handleReset}>Reset</Button>
-          <Button variant="primary" onClick={handleSkip}>Skip</Button>
+          <Button variant="success" onClick={handleSubmit}>
+            Submit
+          </Button>
+          <Button variant="danger" onClick={handleReset}>
+            Reset
+          </Button>
+          <Button variant="primary" onClick={handleSkip}>
+            Skip
+          </Button>
           <Button variant="info" onClick={() => switchMode("visualize")}>
             Show Visualization
           </Button>
@@ -389,7 +402,9 @@ const Kruskal = () => {
       ) : (
         <div className="visualizer-controls">
           <div className="controls">
-            <Button variant="secondary" onClick={handleReset}>Reset</Button>
+            <Button variant="secondary" onClick={handleReset}>
+              Reset
+            </Button>
             <Button variant="primary" onClick={handlePlayPause}>
               {isRunning ? "Pause" : "Play"}
             </Button>
