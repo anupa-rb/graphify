@@ -1,6 +1,9 @@
 import Button from "react-bootstrap/Button";
 import "../styles/landingPage.css";
 import Card from "react-bootstrap/Card";
+import ChatbotComponent from "./ChatBot"; 
+import "../styles/ChatBot.css";
+
 
 const LandingPage = () => {
   return (
@@ -51,6 +54,8 @@ const LandingPage = () => {
       <Button variant="light" size="lg" href="/learnmore" className="btn">
         Learn More
       </Button>
+
+      <ChatbotComponent />
     </div>
   );
 };
