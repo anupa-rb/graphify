@@ -22,7 +22,7 @@
 - `react-router-dom` - Client-side routing  
 - `react-icons` - Icons for chatbot button  
 **Styling**: Custom CSS (`algorithm.css`, `ChatBot.css`, `LearnMore.css`, `styles.css`) + Bootstrap CSS  
-**Deployment**: Compatible with GitHub Pages, Netlify, or Vercel.  
+
 
 ## 📂 Project Structure  
 
@@ -52,6 +52,8 @@ graphify/
 └── README.md              # Project documentation
 
 ---
+
+
 
 ## 🎯 Getting Started  
 
