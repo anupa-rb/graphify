@@ -19,8 +19,27 @@
   font-family: "Montserrat", serif;
   font-weight: 1000;
 }
+
+.containerStyle h1 {
+  font-size: 50px;
+  font-weight: 1000;
+  color: #f0f8ff;
+  background: linear-gradient(to right, #ff00cc, #2d6df8); /* Pink to Deep Blue */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+.descriptionStyle {
+  font-size: 20px;
+  font-weight: 500;
+  color: #b1b1b1;
+  display: inline-block;
+}
 .btn {
   margin: 10px;
+  background: #626060;
+  color: aliceblue;
+  border: none;
 }
 .cardStyle {
   display: flex;

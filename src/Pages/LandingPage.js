@@ -8,10 +8,11 @@ const LandingPage = () => {
       <div className="containerStyle">
         <h1>GRAPHIFY</h1>
       </div>
-      <div style={{color:"GrayText"}}>A graph visualiser web with gaming features to make the learning platform more engaging</div>
-      {/* <Button variant="outline-light" size="lg" href="/home" className="btn">
-        Start Learning
-      </Button> */}
+      <div className="descriptionStyle">
+        A graph visualiser web with gaming features to make the learning
+        platform more engaging
+      </div>
+
       <div className="cardStyle">
         <Card.Link href="/prims">
           <Card className="card">
@@ -47,6 +48,9 @@ const LandingPage = () => {
           </Card>
         </Card.Link>
       </div>
+      <Button variant="light" size="lg" href="/learnmore" className="btn">
+        Learn More
+      </Button>
     </div>
   );
 };
