@@ -3,7 +3,7 @@ import NavBar from "../Components/Navbar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
-import "/home/anuja/Graphify/graphify/src/styles/LearnMore.css";
+import "../styles/LearnMore.css";
 
 const LearnMore = () => {
   return (
