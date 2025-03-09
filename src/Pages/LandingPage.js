@@ -17,7 +17,7 @@ const LandingPage = () => {
         <Card.Link href="/prims">
           <Card className="card">
             <Card.Body>
-              <Card.Title style={{ color: "#ff00cc" }}>
+              <Card.Title style={{ color: " #ff00cc" }}>
                 Prim's
                 <br />
                 Algorithm
@@ -48,7 +48,7 @@ const LandingPage = () => {
           </Card>
         </Card.Link>
       </div>
-      <Button variant="light" size="lg" href="/learnmore" className="btn">
+      <Button variant="secondary" href="/learnmore" className="btn">
         Learn More
       </Button>
     </div>
