@@ -1,70 +1,51 @@
-# Getting Started with Create React App
+# Graphify
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
 
-In the project directory, you can run:
+**Graphify** is an interactive web application designed to educate users about graph algorithms through visualizations, quizzes, and a chatbot assistant. It supports learning and exploring Prim's, Kruskal's, and Dijkstra's algorithms with a clean, intuitive interface.
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Interactive Visualizations**: Step-by-step animations for Prim's, Kruskal's, and Dijkstra's algorithms using `vis-network`.
+- **Quiz Mode**: Test your skills by selecting edges for MSTs or shortest paths, with real-time feedback.
+- **Chatbot Assistant**: Ask questions about graph algorithms and receive concise explanations via `react-chatbot-kit`.
+- **Learn More Page**: Detailed descriptions and pseudocode for each algorithm in an accordion layout.
+- **Random Graph Generation**: Practice with dynamically generated graphs.
+- **Navigation**: Seamless routing with a responsive `Navbar` using `react-bootstrap`.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
+- **Frontend**: React.js
+- **Libraries**:
+  - `vis-network`: Graph visualization
+  - `react-bootstrap` & `bootstrap`: UI components
+  - `react-chatbot-kit`: Chatbot functionality
+  - `heap-js`: Priority queue for Prim's algorithm
+  - `react-router-dom`: Client-side routing
+  - `react-icons`: Chatbot button icon
+- **Styling**: Custom CSS (`algorithm.css`, `ChatBot.css`, `LearnMore.css`, `styles.css`) + Bootstrap CSS
+- **Deployment**: Static site-ready (e.g., GitHub Pages, Netlify)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Project Structure
+graphify/
+├── src/                    # Source code directory
+│   ├── Components/         # Reusable React components
+│   │   ├── ChatbotComponent.js    # Chatbot with algorithm explanations
+│   │   └── NavBar.js             # Navigation bar with dropdown
+│   ├── Pages/             # Page components for different routes
+│   │   ├── Dijktras.js           # Dijkstra's algorithm page
+│   │   ├── Prims.js              # Prim's algorithm page
+│   │   ├── Kruskals.js           # Kruskal's algorithm page
+│   │   ├── LearnMore.js          # Educational content page
+│   │   └── LandingPage.js        # (Assumed) Homepage
+│   ├── styles/            # CSS stylesheets
+│   │   ├── algorithm.css         # Graph visualization styles
+│   │   ├── ChatBot.css           # Chatbot styles
+│   │   ├── LearnMore.css         # Learn More page styles
+│   │   └── styles.css            # General styles (e.g., Navbar)
+│   └── Router.js          # Routing configuration
+├── public/                # Public assets
+│   ├── index.html                # HTML entry point
+│   └── logo.png                  # (Placeholder) Graphify logo
+├── package.json           # Dependencies and scripts
+└── README.md              # Project documentation
