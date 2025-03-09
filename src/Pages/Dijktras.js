@@ -328,6 +328,11 @@ const Dijkstra = () => {
     }
   };
 
+  const getEdgeLabel = (edgeId) => {
+    const edge = edges.current.get(edgeId);
+    return edge ? `${edge.label} (A${edge.from}-A${edge.to})` : "";
+  };
+
   return (
     <div className="algoContainer">
       <NavBar />
@@ -390,3 +395,5 @@ const Dijkstra = () => {
 };
 
 export default Dijkstra;
+
+

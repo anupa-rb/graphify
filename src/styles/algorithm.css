@@ -1,3 +1,5 @@
+
+
 .algoContainer {
   background-color: #1e293b;
   text-align: center;
@@ -26,12 +28,15 @@
 
 .title {
   color: white;
+  padding: 20px 0;
 }
 
 .btn {
   margin: 10px;
   padding: 10px;
 }
+
 .feedback {
   color: white;
+  margin: 10px 0;
 }

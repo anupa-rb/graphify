@@ -4,9 +4,6 @@ import "react-chatbot-kit/build/main.css";
 import "../styles/ChatBot.css"; // Import chatbot styles
 import { BsChatDots } from "react-icons/bs";
 
-
-
-
 // Configuration for chatbot
 const config = {
   initialMessages: [
